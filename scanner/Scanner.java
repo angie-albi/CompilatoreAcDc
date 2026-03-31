@@ -9,6 +9,7 @@ import token.*;
 
 public class Scanner {
 	final char EOF = (char) -1; 
+	@SuppressWarnings("unused")
 	private int riga;
 	private PushbackReader buffer;
 
@@ -31,11 +32,12 @@ public class Scanner {
   // nextToken ritorna il prossimo token nel file di input e legge 
   // i caratteri del token ritornato (avanzando fino al carattere
   // successivo all'ultimo carattere del token)
-	public Token nextToken()  {
+	public Token nextToken() throws IOException  {
 
 		// nextChar contiene il prossimo carattere dell'input (non consumato).
 		char nextChar = peekChar(); //Catturate l'eccezione IOException e 
 		       // ritornate una LexicalException che la contiene
+		
 
 		// Avanza nel buffer leggendo i carattere in skipChars
 		// incrementando riga se leggi '\n'.
@@ -64,7 +66,7 @@ public class Scanner {
 		// eccezione lessicale dicendo la riga e il carattere che la hanno
 		// provocata. 
 
-
+		return null;
 	}
 
 	// private Token scanId()
@@ -75,6 +77,7 @@ public class Scanner {
 
 	
 
+	@SuppressWarnings("unused")
 	private char readChar() throws IOException {
 		return ((char) this.buffer.read());
 	}
