@@ -53,7 +53,6 @@ public class Scanner {
 		skpChars.add('\t');
 		skpChars.add('\n');
 		skpChars.add('\r');
-		skpChars.add(EOF);
 		
 		
 		//Lettere
@@ -139,8 +138,10 @@ public class Scanner {
 		}
 		
 		//Se è la fine del file, ritorna il token EOF
-		if (nextChar == EOF) 
+		if (nextChar == EOF) {
+			readChar();
 			return new Token(riga, TokenType.EOF);
+		}
 		
 		//Scansiona le parole chiave
 		if (letters.contains(peekChar())) 
@@ -237,7 +238,7 @@ public class Scanner {
 			}
 			
 			if(cont>5)
-				throw new LexicalException(riga, "Errore: ci sono troppe cifre decimali (max 5)");
+				throw new LexicalException(riga, "Troppe cifre decimali (max 5)");
 			
 			return new Token(riga, TokenType.FLOAT, numero.toString());
 		}
