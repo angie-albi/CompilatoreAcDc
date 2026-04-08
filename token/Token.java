@@ -52,7 +52,7 @@ public class Token {
 	@Override
 	public String toString() {
 		if(valore != null) 
-			return "<" + tipo + " , r:" + riga + " , " + valore;
+			return "<" + tipo + " , r:" + riga + " , " + valore + ">";
 		else
 			return "<" + tipo + " , r:" + riga + ">";
 	}
