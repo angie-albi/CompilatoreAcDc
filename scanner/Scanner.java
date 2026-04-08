@@ -4,82 +4,167 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PushbackReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import token.*;
 
+/**
+ * Gestisce la scansione di un file carattere per carattere generndo i relativi
+ * token che utilizzerà il Parser
+ */
 public class Scanner {
 	final char EOF = (char) -1; 
-	@SuppressWarnings("unused")
 	private int riga;
 	private PushbackReader buffer;
+	
+	private Set<Character> skpChars;	//lista caratteri di skip (include EOF)
+	private Set<Character> letters; 	//lista lettere 
+	private Set<Character> digits; 		//lista numeri 
 
-	// skpChars: insieme caratteri di skip (include EOF) e inizializzazione
-	// letters: insieme lettere 
-	// digits: cifre 
-
-	// operTkType: mapping fra caratteri '+', '-', '*', '/'  e il TokenType corrispondente
-	// delimTkType: mapping fra caratteri '=', ';' e il e il TokenType corrispondente
-
-	// keyWordsTkType: mapping fra le stringhe "print", "float", "int" e il TokenType  corrispondente
-
+	private Map<Character, TokenType> operTkType; 		//mappa fra caratteri operatore '+', '-', '*', '/'  e il TokenType corrispondente
+	private Map<Character, TokenType> delimTkType; 		//mappa fra caratteri delimitatore '=', ';' e il e il TokenType corrispondente
+	private Map<String, TokenType> keyWordsTkType; 		//mappa keyword e il TokenType  corrispondente
+	
+	/**
+	 * Costruttore che inizializza il lettore del file e inizializza tutte le 
+	 * variabili necessarie per il riconoscimento dei token
+	 * 
+	 * @param fileName Nome del file da scansionare
+	 * @throws FileNotFoundException Eccezione se il file non è stato trovato
+	 */
 	public Scanner(String fileName) throws FileNotFoundException {
-
-		this.buffer = new PushbackReader(new FileReader(fileName));
+		buffer = new PushbackReader(new FileReader(fileName));
 		riga = 1;
-		// inizializzare campi che non hanno inizializzazione
+		
+		iniz();
 	}
 	
-  // nextToken ritorna il prossimo token nel file di input e legge 
-  // i caratteri del token ritornato (avanzando fino al carattere
-  // successivo all'ultimo carattere del token)
-	public Token nextToken() throws IOException  {
+	/**
+	 * Inizializzazione delle variabili dello scanner
+	 */
+	private void iniz() {
+		//Caratteri da ignorare
+		skpChars = new HashSet<>();
 
-		// nextChar contiene il prossimo carattere dell'input (non consumato).
-		char nextChar = peekChar(); //Catturate l'eccezione IOException e 
-		       // ritornate una LexicalException che la contiene
+		skpChars.add(' ');
+		skpChars.add('\t');
+		skpChars.add('\n');
+		skpChars.add('\r');
+		skpChars.add(EOF);
 		
-
-		// Avanza nel buffer leggendo i carattere in skipChars
-		// incrementando riga se leggi '\n'.
-		// Se raggiungi la fine del file ritorna il Token EOF
-
-
-		// Se nextChar e' in letters
-		// return scanId()
-		// che deve generare o un Token ID o parola chiave
-
-		// Se nextChar e' o in operators oppure delimitatore
-		// ritorna il Token associato con l'operatore o il delimitatore
-		// Attenzione agli operatori di assegnamento!
-
-		// Se nextChar e' ; o = 
-		// ritorna il Token associato
 		
+		//Lettere
+		letters = new HashSet<>();
+		
+		for (char c = 'a'; c <= 'z'; c++) 
+            letters.add(c);
+        
 
-		// Se nextChar e' in numbers
-		// return scanNumber()
-		// che legge sia un intero che un float e ritorna il Token INUM o FNUM
-		// i caratteri che leggete devono essere accumulati in una stringa
-		// che verra' assegnata al campo valore del Token
+		//Cifre
+		digits = new HashSet<>();
+		
+		for (char c = '0'; c <= '9'; c++) 
+			digits.add(c);
+		
+		//Operatori
+		operTkType = new HashMap<>();
+		operTkType.put('+', TokenType.PLUS);
+		operTkType.put('-', TokenType.MINUS);
+		operTkType.put('*', TokenType.TIMES);
+		operTkType.put('/', TokenType.DIVIDE);
 
-		// Altrimenti il carattere NON E' UN CARATTERE LEGALE sollevate una
-		// eccezione lessicale dicendo la riga e il carattere che la hanno
-		// provocata. 
+		//Delimitatore e assegnamento
+		delimTkType = new HashMap<>();
+		delimTkType.put('=', TokenType.ASSIGN);
+		delimTkType.put(';', TokenType.SEMI);
 
-		return null;
+		//Parole chiave
+		keyWordsTkType = new HashMap<>();
+		keyWordsTkType.put("print", TokenType.PRINT);
+		keyWordsTkType.put("float", TokenType.TYFLOAT);
+		keyWordsTkType.put("int", TokenType.TYINT);
+	}
+	
+	/**
+	 * Ritorna il prossimo token nel file di input e legge i caratteri del token ritornato 
+	 * 
+	 * @return Il token successivo
+	 * @throws LexicalException Eccezione lessicale, se il token non è valido
+	 */
+	public Token nextToken() throws LexicalException  {
+		try {
+			char nextChar = peekChar(); // guarda il prossimo carattere
+			
+			//Si saltano i caratteri vuoti finché non si trova qualcosa da leggere
+			while (skpChars.contains(nextChar)) {
+				readChar(); 	//consuma il carattere
+				if (nextChar == '\n') {
+					riga++;
+				}
+				
+				nextChar = peekChar();
+			}
+			
+			//Se è la fine del file, ritorna il token EOF
+			if (nextChar == EOF) 
+				return new Token(riga, TokenType.EOF);
+			
+			//Scansiona le parole chiave
+			if (letters.contains(peekChar())) 
+				return scanId();
+
+			//Scansiona gli operatori
+			if (operTkType.containsKey(peekChar())) 
+				return scanOperator();
+			
+			//Scansiona i numeri
+			if (digits.contains(peekChar())) 
+				return scanNumber();
+			
+			//Scansiona i delimitatori
+			if (delimTkType.containsKey(peekChar())) 
+				return new Token(riga, delimTkType.get(readChar()));
+
+			//Il carattere non fa parte del linguaggio
+			readChar();
+			throw new LexicalException(riga, "Carattere invalido (" + nextChar + ")");
+		
+		} catch (IOException e) {
+			throw new LexicalException(riga, "Errore di lettura I/O: " + e.getMessage());
+		}
+	}
+	
+	private Token scanId() throws IOException {
+		StringBuilder idValore = new StringBuilder();
+		char c = peekChar();
+
+		while (letters.contains(c) || digits.contains(c)) {
+			idValore.append(readChar());
+			c = peekChar();
+		}
+
+		String id = idValore.toString();
+		
+		if (keyWordsTkType.containsKey(id)) 
+			return new Token(riga, keyWordsTkType.get(id)); 
+		else 
+			return new Token(riga, TokenType.ID, id);
+	}
+	
+	private Token scanOperator() {
+		
+	}
+		
+	private Token scanNumber() {
+		
 	}
 
-	// private Token scanId()
 	
-	// private Token scanOperator()
-		
-	// private Token scanNumber()
-
-	
-
-	@SuppressWarnings("unused")
 	private char readChar() throws IOException {
-		return ((char) this.buffer.read());
+		return ((char) buffer.read());
 	}
 
 	private char peekChar() throws IOException {
