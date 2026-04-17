@@ -1,7 +1,7 @@
 package scanner;
 
 /**
- * Eccezione personalizzata per gestire gli errori durante l'analisi lessicale
+ * Eccezione personalizzata per gestire gli errori durante l'analisi lessicale dello Scanner
  */
 @SuppressWarnings("serial")
 public class LexicalException extends Exception {

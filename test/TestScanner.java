@@ -253,4 +253,18 @@ public class TestScanner {
 		
 		assertEquals(TokenType.EOF, t.getTipo());
 	}
+	
+	@Test
+	void peekToken () throws Exception {
+		inizializzaScanner("testGenerale.txt");
+		assertEquals(scanner.peekToken().getTipo(), TokenType.TYINT );
+		assertEquals(scanner.nextToken().getTipo(), TokenType.TYINT );
+		assertEquals(scanner.peekToken().getTipo(), TokenType.ID );
+		assertEquals(scanner.peekToken().getTipo(), TokenType.ID );
+		
+		Token t = scanner.nextToken();
+		assertEquals(t.getTipo(), TokenType.ID);
+		assertEquals(t.getRiga(), 1);
+		assertEquals(t.getValore(), "temp");
+	}
 }

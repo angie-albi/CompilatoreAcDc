@@ -19,6 +19,7 @@ public class Scanner {
 	final char EOF = (char) -1; 
 	private int riga;
 	private PushbackReader buffer;
+	private Token nextTk = null; 		//memorizza il prossimo token senza consumarlo
 	
 	private Set<Character> skpChars;	//lista caratteri di skip (include EOF)
 	private Set<Character> letters; 	//lista lettere 
@@ -125,9 +126,16 @@ public class Scanner {
 	 * @throws LexicalException Eccezione lessicale, se il token non è valido
 	 */
 	public Token nextToken() throws LexicalException  {
+		// Se avevamo salvato un token con peekToken, lo restituiamo e svuotiamo la memoria
+		if (nextTk != null) {
+			Token tokenDaRitornare = nextTk;
+			nextTk = null; 
+			return tokenDaRitornare;
+		}
+		
 		char nextChar = peekChar(); 
 		
-		//Si saltano i caratteri vuoti finché non si trova qualcosa da leggere
+		// Si saltano i caratteri vuoti finché non si trova qualcosa da leggere
 		while (skpChars.contains(nextChar)) {
 			readChar(); 
 			if (nextChar == '\n') {
@@ -137,29 +145,29 @@ public class Scanner {
 			nextChar = peekChar();
 		}
 		
-		//Se è la fine del file, ritorna il token EOF
+		// Se è la fine del file, ritorna il token EOF
 		if (nextChar == EOF) {
 			readChar();
 			return new Token(riga, TokenType.EOF);
 		}
 		
-		//Scansiona le parole chiave
+		// Scansiona le parole chiave
 		if (letters.contains(peekChar())) 
 			return scanId();
 
-		//Scansiona gli operatori
+		// Scansiona gli operatori
 		if (operTkType.containsKey(peekChar())) 
 			return scanOperator();
 		
-		//Scansiona i numeri
+		// Scansiona i numeri
 		if (digits.contains(peekChar())) 
 			return scanNumber();
 		
-		//Scansiona i delimitatori
+		// Scansiona i delimitatori
 		if (delimTkType.containsKey(peekChar())) 
 			return new Token(riga, delimTkType.get(readChar()));
 
-		//Il carattere non fa parte del linguaggio
+		// Il carattere non fa parte del linguaggio
 		readChar();
 		throw new LexicalException(riga, "Carattere invalido (" + nextChar + ")");
 	}
@@ -244,6 +252,20 @@ public class Scanner {
 		}
 		
 		return new Token(riga, TokenType.INT, numero.toString());
+	}
+
+	/**
+	 * Guarda il prossimo token nel file di input senza consumarlo.
+	 * Se il token è già stato "sbirciato", restituisce quello in memoria.
+	 * 
+	 * @return Il prossimo Token
+	 * @throws LexicalException Se si verifica un errore lessicale durante la lettura
+	 */
+	public Token peekToken() throws LexicalException {
+		if (nextTk == null) 
+			nextTk = nextToken();
+	
+		return nextTk;
 	}
 	
 }
