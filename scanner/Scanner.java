@@ -12,6 +12,7 @@ import java.util.Set;
 import token.*;
 
 /**
+ * Analizzatore Lessicale 
  * Gestisce la scansione di un file carattere per carattere generndo i relativi
  * token che utilizzerà il Parser
  */
