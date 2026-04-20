@@ -1,7 +1,10 @@
 package parser;
 
+import ast.NodeExpr;
+import ast.NodeStat;
 import scanner.LexicalException;
 import scanner.Scanner;
+
 import token.Token;
 import token.TokenType;
 
@@ -21,6 +24,21 @@ public class Parser {
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 	}
+	
+	/**
+	 * Metodo di supporto per sbirciare il prossimo token catturando 
+	 * automaticamente la LexicalException e convertendola
+	 * 
+	 * @return Il prossimo Token
+	 * @throws SyntacticException Se si verifica un errore lessicale
+	 */
+	private Token peek() throws SyntacticException {
+		try {
+			return scanner.peekToken();
+		} catch (LexicalException e) {
+			throw new SyntacticException(e);
+		}
+	}
 
 	/**
 	 * Verifica se il prossimo token è del tipo atteso e lo consuma
@@ -31,13 +49,7 @@ public class Parser {
 	 *                            lessicale
 	 */
 	private Token match(TokenType expected) throws SyntacticException {
-		Token t;
-
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException("Lexical Exception", e);
-		}
+		Token t = this.peek();
 
 		if (expected.equals(t.getTipo())) {
 			try {
@@ -63,13 +75,7 @@ public class Parser {
 	 * Regola 0: Prg -> DSs EOF
 	 */
 	private void parsePrg() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case TYFLOAT, TYINT, ID, PRINT, EOF -> {
@@ -86,13 +92,7 @@ public class Parser {
 	 * Regole 1, 2, 3: DSs -> Dcl DSs | Stm DSs | epsilon
 	 */
 	private void parseDSs() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case TYFLOAT, TYINT -> {
@@ -123,21 +123,19 @@ public class Parser {
 	/**
 	 * Regole 5, 6: DclP -> ; | = Exp ;
 	 */
-	private void parseDclP() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+	private NodeExpr parseDclP() throws SyntacticException {
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
-			case SEMI -> match(TokenType.SEMI);
+			case SEMI -> {
+				match(TokenType.SEMI);
+				return null;
+			}
 			case ASSIGN -> {
 				match(TokenType.ASSIGN);
 				parseExp();
 				match(TokenType.SEMI);
+				return null;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso ';' oppure '=', trovato " + t.getTipo());
@@ -147,14 +145,8 @@ public class Parser {
 	/**
 	 * Regole 7, 8: Stm -> id Op Exp ; | print id ;
 	 */
-	private void parseStm() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+	private NodeStat parseStm() throws SyntacticException {
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case ID -> {
@@ -162,11 +154,13 @@ public class Parser {
 				parseOp();
 				parseExp();
 				match(TokenType.SEMI);
+				return null;
 			}
 			case PRINT -> {
 				match(TokenType.PRINT);
 				match(TokenType.ID);
 				match(TokenType.SEMI);
+				return null;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso 'print' o identificatore, trovato " + t.getTipo());
@@ -184,27 +178,24 @@ public class Parser {
 	/**
 	 * Regole 10, 11, 12: ExpP -> + Tr ExpP | - Tr ExpP | epsilon
 	 */
-	private void parseExpP() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+	private NodeExpr parseExpP() throws SyntacticException {
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case PLUS -> {
 				match(TokenType.PLUS);
 				parseTr();
 				parseExpP();
+				return null;
 			}
 			case MINUS -> {
 				match(TokenType.MINUS);
 				parseTr();
 				parseExpP();
+				return null;
 			}
 			case SEMI -> {
+				return null;
 				// Regola epsilon (vuoto), non facciamo nulla
 			}
 			
@@ -215,35 +206,33 @@ public class Parser {
 	/**
 	 * Regola 13: Tr -> Val TrP
 	 */
-	private void parseTr() throws SyntacticException {
+	private NodeExpr parseTr() throws SyntacticException {
 		parseVal();
 		parseTrP();
+		return null;
 	}
 
 	/**
 	 * Regole 14, 15, 16: TrP -> * Val TrP | / Val TrP | epsilon
 	 */
-	private void parseTrP() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+	private NodeExpr parseTrP() throws SyntacticException {
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case TIMES -> {
 				match(TokenType.TIMES);
 				parseVal();
 				parseTrP();
+				return null;
 			}
 			case DIVIDE -> {
 				match(TokenType.DIVIDE);
 				parseVal();
 				parseTrP();
+				return null;
 			}
 			case PLUS, MINUS, SEMI -> {
+				return null;
 				// Regola epsilon (vuoto), non facciamo nulla
 			}
 			
@@ -255,13 +244,7 @@ public class Parser {
 	 * Regole 17, 18: Ty -> float | int
 	 */
 	private void parseTy() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case TYFLOAT -> match(TokenType.TYFLOAT);
@@ -274,19 +257,22 @@ public class Parser {
 	/**
 	 * Regole 19, 20, 21: Val -> intVal | floatVal | id
 	 */
-	private void parseVal() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+	private NodeExpr parseVal() throws SyntacticException {
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
-			case INT -> match(TokenType.INT);
-			case FLOAT -> match(TokenType.FLOAT);
-			case ID -> match(TokenType.ID);
+			case INT -> {
+				match(TokenType.INT);
+				return null;
+			}
+			case FLOAT -> {
+				match(TokenType.FLOAT);
+				return null;
+			}
+			case ID -> {
+				match(TokenType.ID);
+				return null;
+			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo());
 		}
@@ -296,13 +282,7 @@ public class Parser {
 	 * Regole 22, 23: Op -> = | opAss
 	 */
 	private void parseOp() throws SyntacticException {
-		Token t;
-		
-		try {
-			t = scanner.peekToken();
-		} catch (LexicalException e) {
-			throw new SyntacticException(e);
-		}
+		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case ASSIGN -> match(TokenType.ASSIGN);
