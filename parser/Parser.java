@@ -1,7 +1,13 @@
 package parser;
 
+import ast.LangOper;
+import ast.LangType;
+import ast.NodeDecSt;
+import ast.NodeDecl;
 import ast.NodeExpr;
+import ast.NodeProgram;
 import ast.NodeStat;
+
 import scanner.LexicalException;
 import scanner.Scanner;
 
@@ -67,21 +73,21 @@ public class Parser {
 	 * 
 	 * @throws SyntacticException Se ci sono errori nel codice
 	 */
-	public void parse() throws SyntacticException {
-		this.parsePrg();
+	public NodeProgram parse() throws SyntacticException {
+		return this.parsePrg();
 	}
 
 	/**
 	 * Regola 0: Prg -> DSs EOF
 	 */
-	private void parsePrg() throws SyntacticException {
+	private NodeProgram parsePrg() throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case TYFLOAT, TYINT, ID, PRINT, EOF -> {
 				parseDSs();
 				match(TokenType.EOF);
-				return;
+				return null;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Token non valido per l'inizio di un programma: " + t.getTipo());
@@ -91,20 +97,23 @@ public class Parser {
 	/**
 	 * Regole 1, 2, 3: DSs -> Dcl DSs | Stm DSs | epsilon
 	 */
-	private void parseDSs() throws SyntacticException {
+	private NodeDecSt parseDSs() throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			case TYFLOAT, TYINT -> {
 				parseDcl();
 				parseDSs();
+				return null;
 			}
 			case ID, PRINT -> {
 				parseStm();
 				parseDSs();
+				return null;
 			}
 			case EOF -> {
 				// Regola epsilon (vuoto), non facciamo nulla
+				return null;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Token non valido in DSs: " + t.getTipo());
@@ -114,10 +123,19 @@ public class Parser {
 	/**
 	 * Regola 4: Dcl -> Ty id DclP
 	 */
-	private void parseDcl() throws SyntacticException {
-		parseTy();
-		match(TokenType.ID);
-		parseDclP();
+	private NodeDecl parseDcl() throws SyntacticException {
+		Token t = this.peek();
+
+		switch (t.getTipo()) {
+			case TYFLOAT, TYINT -> {
+				parseTy();
+				match(TokenType.ID);
+				parseDclP();
+				return null;
+			}
+			
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " +  t.getTipo());
+		}
 	}
 
 	/**
@@ -170,10 +188,20 @@ public class Parser {
 	/**
 	 * Regola 9: Exp -> Tr ExpP
 	 */
-	private void parseExp() throws SyntacticException {
-		parseTr();
-		parseExpP();
+	private NodeExpr parseExp() throws SyntacticException {
+		Token t = this.peek();
+		
+		switch (t.getTipo()) {
+			case ID, FLOAT, INT -> {
+				parseTr();
+				parseExpP();
+				return null;
+			}
+		
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo());
+		}
 	}
+		
 
 	/**
 	 * Regole 10, 11, 12: ExpP -> + Tr ExpP | - Tr ExpP | epsilon
@@ -207,9 +235,17 @@ public class Parser {
 	 * Regola 13: Tr -> Val TrP
 	 */
 	private NodeExpr parseTr() throws SyntacticException {
-		parseVal();
-		parseTrP();
-		return null;
+		Token t = this.peek();
+
+		switch (t.getTipo()) {
+			case ID, FLOAT, INT -> {
+				parseVal();
+				parseTrP();
+				return null;
+			}
+			
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo());
+		}
 	}
 
 	/**
@@ -243,14 +279,20 @@ public class Parser {
 	/**
 	 * Regole 17, 18: Ty -> float | int
 	 */
-	private void parseTy() throws SyntacticException {
+	private LangType parseTy() throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
-			case TYFLOAT -> match(TokenType.TYFLOAT);
-			case TYINT -> match(TokenType.TYINT);
+			case TYFLOAT -> {
+				match(TokenType.TYFLOAT);
+				return null;
+			}
+			case TYINT -> {
+				match(TokenType.TYINT);
+				return null;
+			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso tipo 'int' o 'float', trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " + t.getTipo());
 		}
 	}
 
@@ -281,15 +323,20 @@ public class Parser {
 	/**
 	 * Regole 22, 23: Op -> = | opAss
 	 */
-	private void parseOp() throws SyntacticException {
+	private LangOper parseOp() throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
-			case ASSIGN -> match(TokenType.ASSIGN);
-			case OP_ASSIGN -> match(TokenType.OP_ASSIGN);
+			case ASSIGN -> {
+				match(TokenType.ASSIGN);
+				return null;
+			}
+			case OP_ASSIGN -> {
+				match(TokenType.OP_ASSIGN);
+				return null;
+			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso '=' o operatore di assegnamento (+=, -=, ...), trovato " + t.getTipo());
 		}
 	}
-
 }
