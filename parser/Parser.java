@@ -55,8 +55,7 @@ public class Parser {
 	 * 
 	 * @param expected Il tipo di token atteso
 	 * @return Il token appena consumato
-	 * @throws SyntacticException Se il token non corrisponde o c'è un errore
-	 *                            lessicale
+	 * @throws SyntacticException Se il token non corrisponde o c'è un errore lessicale
 	 */
 	private Token match(TokenType expected) throws SyntacticException {
 		Token t = this.peek();
@@ -157,7 +156,7 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
-			// DclP -> ;
+			//DclP -> ;
 			case SEMI -> {
 				match(TokenType.SEMI);
 				return null;
@@ -208,6 +207,7 @@ public class Parser {
 		Token t = this.peek();
 		
 		switch (t.getTipo()) {
+		    //Exp -> Tr ExpP
 			case ID, FLOAT, INT -> {
 				parseTr();
 				parseExpP();
@@ -226,16 +226,19 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+		 	//ExpP -> + Tr ExpP
 			case PLUS -> {
 				match(TokenType.PLUS);
 				parseTr();
 				return parseExpP();
 			}
+			//ExpP -> - Tr ExpP
 			case MINUS -> {
 				match(TokenType.MINUS);
 				parseTr();
 				return parseExpP();
 			}
+			//ExpP -> epsilon
 			case SEMI -> {
 				return null;
 				// Regola epsilon (vuoto), non facciamo nulla
@@ -252,6 +255,7 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Tr -> Val TrP 
 			case ID, FLOAT, INT -> {
 				parseVal();
 				parseTrP();
@@ -269,18 +273,21 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//TrP -> * Val TrP
 			case TIMES -> {
 				match(TokenType.TIMES);
 				parseVal();
 				parseTrP();
 				return null;
 			}
+			//TrP -> / Val TrP
 			case DIVIDE -> {
 				match(TokenType.DIVIDE);
 				parseVal();
 				parseTrP();
 				return null;
 			}
+			//TrP -> epsilon
 			case PLUS, MINUS, SEMI -> {
 				return null;
 				// Regola epsilon (vuoto), non facciamo nulla
@@ -297,13 +304,15 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Ty -> float
 			case TYFLOAT -> {
 				match(TokenType.TYFLOAT);
-				return LangType.Float;
+				return LangType.FLOAT;
 			}
+			//Ty -> int
 			case TYINT -> {
 				match(TokenType.TYINT);
-				return LangType.Int;
+				return LangType.INT;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " + t.getTipo().toString());
@@ -317,14 +326,17 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Val -> intVal 
 			case INT -> {
 				match(TokenType.INT);
 				return null;
 			}
+			//Val -> floatVal
 			case FLOAT -> {
 				match(TokenType.FLOAT);
 				return null;
 			}
+			//Val -> id
 			case ID -> {
 				match(TokenType.ID);
 				return null;
@@ -341,10 +353,12 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Op -> =
 			case ASSIGN -> {
 				match(TokenType.ASSIGN);
 				return null;
 			}
+			//Op -> opAss
 			case OP_ASSIGN -> {
 				match(TokenType.OP_ASSIGN);
 				return null;
