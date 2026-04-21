@@ -1,10 +1,14 @@
 package parser;
 
+import java.util.ArrayList;
+
 import ast.LangOper;
 import ast.LangType;
 import ast.NodeDecSt;
 import ast.NodeDecl;
 import ast.NodeExpr;
+import ast.NodeId;
+import ast.NodePrint;
 import ast.NodeProgram;
 import ast.NodeStat;
 
@@ -64,7 +68,7 @@ public class Parser {
 				throw new SyntacticException("Lexical Exception", e);
 			}
 		} else {
-			throw new SyntacticException(t.getRiga(), "Atteso token " + expected + ", trovato " + t.getTipo() + " (" + t.getValore() + ")");
+			throw new SyntacticException(t.getRiga(), "Atteso token " + expected + ", trovato " + t.getTipo().toString() + " (" + t.getValore() + ")");
 		}
 	}
 
@@ -84,39 +88,45 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Prg -> DSs EOF
 			case TYFLOAT, TYINT, ID, PRINT, EOF -> {
+				ArrayList<NodeDecSt> dss = parseDSs();
 				parseDSs();
 				match(TokenType.EOF);
-				return null;
+				return new NodeProgram(dss);
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Token non valido per l'inizio di un programma: " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Token non valido per l'inizio di un programma: " + t.getTipo().toString());
 		}
 	}
 
 	/**
 	 * Regole 1, 2, 3: DSs -> Dcl DSs | Stm DSs | epsilon
 	 */
-	private NodeDecSt parseDSs() throws SyntacticException {
+	private ArrayList<NodeDecSt> parseDSs() throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//DSs -> Dcl DSs 
 			case TYFLOAT, TYINT -> {
-				parseDcl();
-				parseDSs();
-				return null;
+				NodeDecl dec = parseDcl();
+				ArrayList<NodeDecSt> dss = parseDSs();
+				dss.add(0, dec);
+				return dss;
 			}
+			//DSs -> Stm DSs
 			case ID, PRINT -> {
-				parseStm();
-				parseDSs();
-				return null;
+				NodeStat stm = parseStm();
+				ArrayList<NodeDecSt> dss = parseDSs();
+				dss.add(0, stm);;
+				return dss;
 			}
+			//DSs -> epsilon
 			case EOF -> {
-				// Regola epsilon (vuoto), non facciamo nulla
-				return null;
+				return new ArrayList<NodeDecSt>();
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Token non valido in DSs: " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Token non valido in DSs: " + t.getTipo().toString());
 		}
 	}
 
@@ -127,14 +137,16 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Dcl -> Ty id DclP
 			case TYFLOAT, TYINT -> {
-				parseTy();
-				match(TokenType.ID);
-				parseDclP();
-				return null;
+				LangType tipo = parseTy();
+				NodeId nome = new NodeId(match(TokenType.ID).getValore());
+				NodeExpr init = parseDclP();
+				
+				return new NodeDecl( nome, tipo, init);
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " +  t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " +  t.getTipo().toString());
 		}
 	}
 
@@ -145,10 +157,12 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			// DclP -> ;
 			case SEMI -> {
 				match(TokenType.SEMI);
 				return null;
 			}
+			//DclP -> = Exp ;
 			case ASSIGN -> {
 				match(TokenType.ASSIGN);
 				parseExp();
@@ -156,7 +170,7 @@ public class Parser {
 				return null;
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso ';' oppure '=', trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso ';' oppure '=', trovato " + t.getTipo().toString());
 		}
 	}
 
@@ -167,21 +181,23 @@ public class Parser {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
+			//Stm -> id Op Exp ;
 			case ID -> {
-				match(TokenType.ID);
+				NodeId nome = new NodeId(match(TokenType.ID).getValore());
 				parseOp();
 				parseExp();
 				match(TokenType.SEMI);
 				return null;
 			}
+			//Stm ->  print id ;
 			case PRINT -> {
 				match(TokenType.PRINT);
-				match(TokenType.ID);
+				NodeId nome =new NodeId(match(TokenType.ID).getValore());
 				match(TokenType.SEMI);
-				return null;
+				return new NodePrint(nome);
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso 'print' o identificatore, trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso 'print' o identificatore, trovato " + t.getTipo().toString());
 		}
 	}
 
@@ -198,7 +214,7 @@ public class Parser {
 				return null;
 			}
 		
-			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo().toString());
 		}
 	}
 		
@@ -213,21 +229,19 @@ public class Parser {
 			case PLUS -> {
 				match(TokenType.PLUS);
 				parseTr();
-				parseExpP();
-				return null;
+				return parseExpP();
 			}
 			case MINUS -> {
 				match(TokenType.MINUS);
 				parseTr();
-				parseExpP();
-				return null;
+				return parseExpP();
 			}
 			case SEMI -> {
 				return null;
 				// Regola epsilon (vuoto), non facciamo nulla
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso '+', '-' o ';', trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso '+', '-' o ';', trovato " + t.getTipo().toString());
 		}
 	}
 
@@ -244,7 +258,7 @@ public class Parser {
 				return null;
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo().toString());
 		}
 	}
 
@@ -285,14 +299,14 @@ public class Parser {
 		switch (t.getTipo()) {
 			case TYFLOAT -> {
 				match(TokenType.TYFLOAT);
-				return null;
+				return LangType.Float;
 			}
 			case TYINT -> {
 				match(TokenType.TYINT);
-				return null;
+				return LangType.Int;
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " + t.getTipo().toString());
 		}
 	}
 
@@ -316,7 +330,7 @@ public class Parser {
 				return null;
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo().toString());
 		}
 	}
 
@@ -336,7 +350,7 @@ public class Parser {
 				return null;
 			}
 			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso '=' o operatore di assegnamento (+=, -=, ...), trovato " + t.getTipo());
+			default -> throw new SyntacticException(t.getRiga(), "Atteso '=' o operatore di assegnamento (+=, -=, ...), trovato " + t.getTipo().toString());
 		}
 	}
 }
