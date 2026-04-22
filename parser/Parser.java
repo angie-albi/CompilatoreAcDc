@@ -2,10 +2,15 @@ package parser;
 
 import java.util.ArrayList;
 
+import ast.AssignOper;
 import ast.LangOper;
 import ast.LangType;
+import ast.NodeAssign;
+import ast.NodeBinOp;
+import ast.NodeCost;
 import ast.NodeDecSt;
 import ast.NodeDecl;
+import ast.NodeDeref;
 import ast.NodeExpr;
 import ast.NodeId;
 import ast.NodePrint;
@@ -142,7 +147,7 @@ public class Parser {
 				NodeId nome = new NodeId(match(TokenType.ID).getValore());
 				NodeExpr init = parseDclP();
 				
-				return new NodeDecl( nome, tipo, init);
+				return new NodeDecl(nome, tipo, init);
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " +  t.getTipo().toString());
@@ -164,9 +169,9 @@ public class Parser {
 			//DclP -> = Exp ;
 			case ASSIGN -> {
 				match(TokenType.ASSIGN);
-				parseExp();
+				NodeExpr expr = parseExp();
 				match(TokenType.SEMI);
-				return null;
+				return expr;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso ';' oppure '=', trovato " + t.getTipo().toString());
@@ -183,10 +188,26 @@ public class Parser {
 			//Stm -> id Op Exp ;
 			case ID -> {
 				NodeId nome = new NodeId(match(TokenType.ID).getValore());
-				parseOp();
-				parseExp();
+				AssignOper op = parseOp();
+				NodeExpr expr = parseExp();
 				match(TokenType.SEMI);
-				return null;
+				
+				if(op != AssignOper.ASSIGN) {
+					LangOper operMat = switch (op) {
+						case PLUSASSIGN -> LangOper.PLUS;
+						case MINUSASSIGN -> LangOper.MINUS;
+						case TIMESASSIGN -> LangOper.TIMES;
+						case DIVASSIGN -> LangOper.DIVIDE;
+						default -> throw new SyntacticException(t.getRiga(), "Assegnamento non valido, trovato " + t.getTipo().toString());
+					};
+					
+					NodeExpr sx = new NodeDeref(nome);
+					NodeBinOp binOp = new NodeBinOp(operMat, sx, expr);
+					
+					return new NodeAssign(nome, binOp);
+				}
+				
+				return new NodeAssign(nome, expr);
 			}
 			//Stm ->  print id ;
 			case PRINT -> {
@@ -209,9 +230,8 @@ public class Parser {
 		switch (t.getTipo()) {
 		    //Exp -> Tr ExpP
 			case ID, FLOAT, INT -> {
-				parseTr();
-				parseExpP();
-				return null;
+				NodeExpr sx = parseTr();
+				return parseExpP(sx);
 			}
 		
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo().toString());
@@ -222,26 +242,27 @@ public class Parser {
 	/**
 	 * Regole 10, 11, 12: ExpP -> + Tr ExpP | - Tr ExpP | epsilon
 	 */
-	private NodeExpr parseExpP() throws SyntacticException {
+	private NodeExpr parseExpP(NodeExpr sx) throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
 		 	//ExpP -> + Tr ExpP
 			case PLUS -> {
 				match(TokenType.PLUS);
-				parseTr();
-				return parseExpP();
+				NodeExpr tr = parseTr();
+				NodeExpr expr = parseExpP(tr);
+				return new NodeBinOp(LangOper.PLUS, sx, expr);
 			}
 			//ExpP -> - Tr ExpP
 			case MINUS -> {
 				match(TokenType.MINUS);
-				parseTr();
-				return parseExpP();
+				NodeExpr tr = parseTr();
+				NodeExpr expr = parseExpP(tr);
+				return new NodeBinOp(LangOper.MINUS, sx, expr);
 			}
 			//ExpP -> epsilon
 			case SEMI -> {
-				return null;
-				// Regola epsilon (vuoto), non facciamo nulla
+				return sx;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso '+', '-' o ';', trovato " + t.getTipo().toString());
@@ -257,9 +278,8 @@ public class Parser {
 		switch (t.getTipo()) {
 			//Tr -> Val TrP 
 			case ID, FLOAT, INT -> {
-				parseVal();
-				parseTrP();
-				return null;
+				NodeExpr sx = parseVal();
+				return parseTrP(sx);
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo().toString());
@@ -269,28 +289,27 @@ public class Parser {
 	/**
 	 * Regole 14, 15, 16: TrP -> * Val TrP | / Val TrP | epsilon
 	 */
-	private NodeExpr parseTrP() throws SyntacticException {
+	private NodeExpr parseTrP(NodeExpr sx) throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			//TrP -> * Val TrP
 			case TIMES -> {
 				match(TokenType.TIMES);
-				parseVal();
-				parseTrP();
-				return null;
+				NodeExpr tr =parseVal();
+				NodeExpr expr = parseTrP(tr);
+				return new NodeBinOp(LangOper.TIMES, sx, expr);
 			}
 			//TrP -> / Val TrP
 			case DIVIDE -> {
 				match(TokenType.DIVIDE);
-				parseVal();
-				parseTrP();
-				return null;
+				NodeExpr tr = parseVal();
+				NodeExpr expr = parseTrP(tr);
+				return new NodeBinOp(LangOper.DIVIDE, sx, expr);
 			}
 			//TrP -> epsilon
 			case PLUS, MINUS, SEMI -> {
-				return null;
-				// Regola epsilon (vuoto), non facciamo nulla
+				return sx;
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso '*', '/', '+', '-' o ';', trovato " + t.getTipo());
@@ -328,18 +347,18 @@ public class Parser {
 		switch (t.getTipo()) {
 			//Val -> intVal 
 			case INT -> {
-				match(TokenType.INT);
-				return null;
+				String nome = match(TokenType.INT).getValore();
+				return new NodeCost(nome, LangType.INT);
 			}
 			//Val -> floatVal
 			case FLOAT -> {
-				match(TokenType.FLOAT);
-				return null;
+				String nome = match(TokenType.FLOAT).getValore();
+				return new NodeCost(nome, LangType.FLOAT);
 			}
 			//Val -> id
 			case ID -> {
-				match(TokenType.ID);
-				return null;
+				NodeId nome = new NodeId(match(TokenType.ID).getValore());
+				return new NodeDeref(nome);
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico o identificatore, trovato " + t.getTipo().toString());
@@ -349,22 +368,34 @@ public class Parser {
 	/**
 	 * Regole 22, 23: Op -> = | opAss
 	 */
-	private LangOper parseOp() throws SyntacticException {
+	private AssignOper parseOp() throws SyntacticException {
 		Token t = this.peek();
 
 		switch (t.getTipo()) {
 			//Op -> =
 			case ASSIGN -> {
 				match(TokenType.ASSIGN);
-				return null;
+				return AssignOper.ASSIGN;
 			}
-			//Op -> opAss
+			//Op -> opAss (+=, -=, *=, /=)
 			case OP_ASSIGN -> {
-				match(TokenType.OP_ASSIGN);
-				return null;
+				String oper = match(TokenType.OP_ASSIGN).getValore();
+				
+				switch (oper) {
+					case "+=":
+						return AssignOper.PLUSASSIGN;
+					case "-=":
+						return AssignOper.MINUSASSIGN;
+					case "*=": 
+						return AssignOper.TIMESASSIGN;
+					case "/=":
+						return AssignOper.DIVASSIGN;
+				}
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso '=' o operatore di assegnamento (+=, -=, ...), trovato " + t.getTipo().toString());
 		}
+		
+		return null;
 	}
 }

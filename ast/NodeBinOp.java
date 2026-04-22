@@ -53,10 +53,10 @@ public class NodeBinOp extends NodeExpr {
 	/**
 	 * Restituisce una rappresentazione sintetica del nodo
 	 * 
-	 * @return Stringa formattata come <BinOp,op=...,sx=...,dx=...>
+	 * @return Stringa formattata come <BinOp,...:sx=...,dx=...>
 	 */
 	@Override
 	public String toString() {
-		return "<BinOp,op=" + op + ",sx=" + sx + ",dx=" + dx + ">";
+		return "<BinOp," + op + ":sx=" + sx + ",dx=" + dx + ">";
 	}
 }
