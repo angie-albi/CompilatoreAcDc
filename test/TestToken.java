@@ -22,7 +22,7 @@ class TestToken {
 		assertEquals(TokenType.PLUS, tokenPlus.getTipo());
 		assertNull(tokenPlus.getValore());
 		
-		assertEquals("<PLUS , r:1>", tokenPlus.toString());
+		assertEquals("<PLUS,r=1>", tokenPlus.toString());
 	}
 	
 	/**
@@ -36,7 +36,7 @@ class TestToken {
 		assertEquals(TokenType.ID, tokenId.getTipo());
 		assertEquals("tempa", tokenId.getValore());
 		
-		assertEquals("<ID , r:5 , tempa>", tokenId.toString());
+		assertEquals("<ID,r=5,val=tempa>", tokenId.toString());
 	}
 
 }

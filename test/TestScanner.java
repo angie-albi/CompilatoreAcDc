@@ -1,8 +1,6 @@
 package test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +10,7 @@ import token.Token;
 import token.TokenType;
 
 /**
- * Classe di test per verificare il corretto funzionamento dell'analizzatore lessicale (Scanner)
+ * Classe di test per verificare il corretto funzionamento dell'analizzatore lessicale
  */
 public class TestScanner {
 
