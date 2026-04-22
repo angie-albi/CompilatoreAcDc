@@ -1,6 +1,6 @@
 package token;
 /**
- * Questa enumerazione contiene tutti i tipi di Token validi per il linguaggio "ac".
+ * Questa enumerazione contiene tutti i tipi di Token validi per il linguaggio "ac"
  */
 public enum TokenType {
 	INT, 

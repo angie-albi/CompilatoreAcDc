@@ -10,7 +10,11 @@ public class Token {
     private String valore;	//valore testuale
     
     /**
-     *  Costruttore con il valore testuale specifico
+     * Costruttore con il valore testuale specifico
+     * 
+     * @param riga La riga in cui è stato trovato il token
+     * @param tipo Il tipo del token
+     * @param valore Il valore testuale del token
      */
 	public Token(int riga, TokenType tipo, String valore) {
 		this.riga = riga;
@@ -19,41 +23,53 @@ public class Token {
 	}
 	
 	/**
-     *  Costruttore senza il valore testuale specifico
-     */
+	 * Costruisce un token senza un valore testuale specifico
+	 * Utile per token il cui tipo è già sufficiente a descriverli (es. operatori o delimitatori)
+	 * 
+	 * @param riga La riga del codice sorgente in cui è stato trovato il token
+	 * @param tipo Il tipo logico del token 
+	 */
 	public Token(int riga, TokenType tipo) {
 		this(riga, tipo, null);
 	}
  
 	/**
-	 * Ritorna il numero di riga del token
+	 * Restituisce il numero di riga in cui il token è stato individuato
+	 * 
+	 * @return La riga del file sorgente
 	 */
 	public int getRiga() {
 		return riga;
 	}
 
 	/**
-	 * Ritorna il tipo del token
+	 * Restituisce la categoria logica a cui appartiene il token
+	 * 
+	 * @return Il tipo logico di token
 	 */
 	public TokenType getTipo() {
 		return tipo;
 	}
 
 	/**
-	 * Ritorna il valore del token
+	 * Restituisce il testo esatto associato al token, se presente
+	 * 
+	 * @return Il valore testuale del token, oppure null se non specificato
 	 */
 	public String getValore() {
 		return valore;
 	}
 
 	/**
-	 * Stampa del token
+	 * Genera una rappresentazione testuale del token formattata
+	 * 
+	 * @return Una stringa nel formato <...,r=...,val=....> oppure <...,r=...>.
 	 */
 	@Override
 	public String toString() {
 		if(valore != null) 
-			return "<" + tipo + " , r:" + riga + " , " + valore + ">";
+			return "<" + tipo + ",r=" + riga + ",val=" + valore + ">";
 		else
-			return "<" + tipo + " , r:" + riga + ">";
+			return "<" + tipo + ",r=" + riga + ">";
 	}
 }

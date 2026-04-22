@@ -87,6 +87,9 @@ public class Parser {
 
 	/**
 	 * Regola 0: Prg -> DSs EOF
+	 * 
+	 * @return Il nodo NodeProgram contenente tutte le istruzioni
+	 * @throws SyntacticException Se il token iniziale non è valido
 	 */
 	private NodeProgram parsePrg() throws SyntacticException {
 		Token t = this.peek();
@@ -106,6 +109,9 @@ public class Parser {
 
 	/**
 	 * Regole 1, 2, 3: DSs -> Dcl DSs | Stm DSs | epsilon
+	 * 
+	 * @return Una lista di dichiarazioni e istruzioni
+	 * @throws SyntacticException Se si incontra un token non valido nel corpo del programma
 	 */
 	private ArrayList<NodeDecSt> parseDSs() throws SyntacticException {
 		Token t = this.peek();
@@ -122,7 +128,7 @@ public class Parser {
 			case ID, PRINT -> {
 				NodeStat stm = parseStm();
 				ArrayList<NodeDecSt> dss = parseDSs();
-				dss.add(0, stm);;
+				dss.add(0, stm);
 				return dss;
 			}
 			//DSs -> epsilon
@@ -136,6 +142,9 @@ public class Parser {
 
 	/**
 	 * Regola 4: Dcl -> Ty id DclP
+	 * 
+	 * @return Il nodo AST per la dichiarazione della variabile
+	 * @throws SyntacticException Se la sintassi della dichiarazione è errata
 	 */
 	private NodeDecl parseDcl() throws SyntacticException {
 		Token t = this.peek();
@@ -156,6 +165,9 @@ public class Parser {
 
 	/**
 	 * Regole 5, 6: DclP -> ; | = Exp ;
+	 * 
+	 * @return L'espressione di inizializzazione, oppure null se non inizializzata
+	 * @throws SyntacticException Se manca il punto e virgola o l'espressione è malformata
 	 */
 	private NodeExpr parseDclP() throws SyntacticException {
 		Token t = this.peek();
@@ -180,6 +192,9 @@ public class Parser {
 
 	/**
 	 * Regole 7, 8: Stm -> id Op Exp ; | print id ;
+	 * 
+	 * @return Il nodo AST che rappresenta l'istruzione (assegnamento o stampa)
+	 * @throws SyntacticException Se l'istruzione è malformata
 	 */
 	private NodeStat parseStm() throws SyntacticException {
 		Token t = this.peek();
@@ -223,6 +238,9 @@ public class Parser {
 
 	/**
 	 * Regola 9: Exp -> Tr ExpP
+	 * 
+	 * @return Il nodo radice dell'espressione valutata
+	 * @throws SyntacticException Se l'espressione è malformata
 	 */
 	private NodeExpr parseExp() throws SyntacticException {
 		Token t = this.peek();
@@ -241,6 +259,10 @@ public class Parser {
 
 	/**
 	 * Regole 10, 11, 12: ExpP -> + Tr ExpP | - Tr ExpP | epsilon
+	 * 
+	 * @param sx L'espressione già valutata alla sinistra dell'operatore
+	 * @return Il nodo dell'espressione risultante
+	 * @throws SyntacticException Se si verifica un errore sintattico
 	 */
 	private NodeExpr parseExpP(NodeExpr sx) throws SyntacticException {
 		Token t = this.peek();
@@ -250,15 +272,15 @@ public class Parser {
 			case PLUS -> {
 				match(TokenType.PLUS);
 				NodeExpr tr = parseTr();
-				NodeExpr expr = parseExpP(tr);
-				return new NodeBinOp(LangOper.PLUS, sx, expr);
+				NodeBinOp binOp = new NodeBinOp(LangOper.PLUS, sx, tr);
+				return parseExpP(binOp);
 			}
 			//ExpP -> - Tr ExpP
 			case MINUS -> {
 				match(TokenType.MINUS);
 				NodeExpr tr = parseTr();
-				NodeExpr expr = parseExpP(tr);
-				return new NodeBinOp(LangOper.MINUS, sx, expr);
+				NodeBinOp binOp = new NodeBinOp(LangOper.MINUS, sx, tr);
+				return parseExpP(binOp);
 			}
 			//ExpP -> epsilon
 			case SEMI -> {
@@ -271,6 +293,9 @@ public class Parser {
 
 	/**
 	 * Regola 13: Tr -> Val TrP
+	 * 
+	 * @return Il nodo termine valutato
+	 * @throws SyntacticException Se il termine è malformato
 	 */
 	private NodeExpr parseTr() throws SyntacticException {
 		Token t = this.peek();
@@ -288,6 +313,10 @@ public class Parser {
 
 	/**
 	 * Regole 14, 15, 16: TrP -> * Val TrP | / Val TrP | epsilon
+	 * 
+	 * @param sx L'espressione già valutata alla sinistra dell'operatore
+	 * @return Il nodo dell'espressione risultante
+	 * @throws SyntacticException Se si verifica un errore sintattico
 	 */
 	private NodeExpr parseTrP(NodeExpr sx) throws SyntacticException {
 		Token t = this.peek();
@@ -297,15 +326,15 @@ public class Parser {
 			case TIMES -> {
 				match(TokenType.TIMES);
 				NodeExpr tr =parseVal();
-				NodeExpr expr = parseTrP(tr);
-				return new NodeBinOp(LangOper.TIMES, sx, expr);
+				NodeBinOp binOp = new NodeBinOp(LangOper.TIMES, sx, tr);
+				return parseTrP(binOp);
 			}
 			//TrP -> / Val TrP
 			case DIVIDE -> {
 				match(TokenType.DIVIDE);
 				NodeExpr tr = parseVal();
-				NodeExpr expr = parseTrP(tr);
-				return new NodeBinOp(LangOper.DIVIDE, sx, expr);
+				NodeBinOp binOp = new NodeBinOp(LangOper.DIVIDE, sx, tr);
+				return parseTrP(binOp);
 			}
 			//TrP -> epsilon
 			case PLUS, MINUS, SEMI -> {
@@ -318,6 +347,9 @@ public class Parser {
 
 	/**
 	 * Regole 17, 18: Ty -> float | int
+	 * 
+	 * @return Il tipo enumerato LangType corrispondente
+	 * @throws SyntacticException Se il tipo non è valido
 	 */
 	private LangType parseTy() throws SyntacticException {
 		Token t = this.peek();
@@ -340,6 +372,9 @@ public class Parser {
 
 	/**
 	 * Regole 19, 20, 21: Val -> intVal | floatVal | id
+	 * 
+	 * @return Il nodo rappresentante un valore costante (NodeCost) o una variabile (NodeDeref)
+	 * @throws SyntacticException Se il token non è un id o un numero
 	 */
 	private NodeExpr parseVal() throws SyntacticException {
 		Token t = this.peek();
@@ -367,6 +402,9 @@ public class Parser {
 
 	/**
 	 * Regole 22, 23: Op -> = | opAss
+	 * 
+	 * @return Il tipo di operazione di assegnamento (AssignOper)
+	 * @throws SyntacticException Se il token non è un operatore di assegnamento valido
 	 */
 	private AssignOper parseOp() throws SyntacticException {
 		Token t = this.peek();
