@@ -2,6 +2,8 @@ package ast;
 
 import java.util.ArrayList;
 
+import visitor.IVisitor;
+
 /**
  * Rappresenta il nodo radice dell'AST per l'intero programma
  */
@@ -26,6 +28,18 @@ public class NodeProgram extends NodeAst {
 	 */
 	public ArrayList<NodeDecSt> getDecSt() {
 		return decSt;
+	}
+	
+	/**
+	 * Accetta il visitor per l'attraversamento dell'AST (Pattern Visitor)
+	 * Il nodo rivela il proprio tipo concreto al visitatore, garantendo che venga
+	 * richiamato il metodo visit() corretto per questa specifica classe
+	 * 
+	 * @param visitor Il visitatore che sta eseguendo l'operazione
+	 */
+	@Override
+	public void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	/**

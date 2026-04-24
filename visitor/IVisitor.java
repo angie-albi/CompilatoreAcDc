@@ -1,14 +1,25 @@
 package visitor;
 
+import ast.NodeAssign;
+import ast.NodeBinOp;
+import ast.NodeCost;
+import ast.NodeDecl;
+import ast.NodeDeref;
+import ast.NodeId;
+import ast.NodePrint;
+import ast.NodeProgram;
+
+/**
+ * Interfaccia del Pattern Visitor per l'Abstract Syntax Tree (AST)
+ * Definisce un metodo di visita per ogni nodo concreto dell'albero
+ */
 public interface IVisitor {
-
+	public abstract void visit(NodeProgram node);
+	public abstract void visit(NodeId node);
+	public abstract void visit(NodeDecl node);
+	public abstract void visit(NodeBinOp node);
+	public abstract void visit(NodeAssign node);
+	public abstract void visit(NodePrint node);
+	public abstract void visit(NodeDeref node);
+	public abstract void visit(NodeCost node);
 }
-
-
-/*
-openScope() 		// apre un nuovo scope in cui inserire i nomi
-closeScope() 		// chiude lo scope piu’ recente (quindi i nomi sono interpretati nel precedente scope)
-enter(nome,infNome) // inserisce il nome nello scope corrente con l’informazione sulla dichiarazione
-lookup(nome) 		
-dichLocale(nome) 	// true se il nome e’ dichiarato nello scope corrente false altrimenti
-*/

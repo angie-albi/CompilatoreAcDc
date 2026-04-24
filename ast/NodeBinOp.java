@@ -1,5 +1,7 @@
 package ast;
 
+import visitor.IVisitor;
+
 /**
  * Rappresenta un nodo dell'AST per un'operazione matematica binaria
  */
@@ -48,6 +50,18 @@ public class NodeBinOp extends NodeExpr {
 	 */
 	public NodeExpr getDx() {
 		return dx;
+	}
+	
+	/**
+	 * Accetta il visitor per l'attraversamento dell'AST (Pattern Visitor)
+	 * Il nodo rivela il proprio tipo concreto al visitatore, garantendo che venga
+	 * richiamato il metodo visit() corretto per questa specifica classe
+	 * 
+	 * @param visitor Il visitatore che sta eseguendo l'operazione
+	 */
+	@Override
+	public void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 	
 	/**
