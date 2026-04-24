@@ -142,17 +142,15 @@ public class TypeCheckingVisitor implements IVisitor{
 	public void visit(NodeAssign node) {
 		node.getId().accept(this);
 		TypeDescriptor idType = resType;
-		
-		// Controllo errore
-		if(idType.getTipo() == TipoTypeDescriptor.ERROR)
-			return;
-		
+	
 		node.getExpr().accept(this);
 		TypeDescriptor expType = resType;
 		
-		// Controllo errore
-		if(expType.getTipo() == TipoTypeDescriptor.ERROR)
+		// Se c'è un errore nell'id o nell'espressione, l'assegnamento fallisce
+		if(idType.getTipo() == TipoTypeDescriptor.ERROR || expType.getTipo() == TipoTypeDescriptor.ERROR) {
+			resType = new TypeDescriptor(TipoTypeDescriptor.ERROR);
 			return;
+		}
 		
 		// Controllo compatibilità
 		if (!idType.compatibile(expType)) {
@@ -218,17 +216,13 @@ public class TypeCheckingVisitor implements IVisitor{
 		TypeDescriptor sxTD = this.resType;
 		TipoTypeDescriptor tipoSx = sxTD.getTipo();
 		
-		// Controllo errore: figlio sinistro
-		if (tipoSx == TipoTypeDescriptor.ERROR) {
-			return;
-		}
-		
 		node.getDx().accept(this);
 		TypeDescriptor dxTD = this.resType;
 		TipoTypeDescriptor tipoDx = dxTD.getTipo();
-		
-		// Controllo errore: figlio destro
-		if (tipoDx == TipoTypeDescriptor.ERROR) {
+	
+		// Se c'è un errore in almeno uno dei due operandi, l'espressione fallisce
+		if (sxTD.getTipo() == TipoTypeDescriptor.ERROR || dxTD.getTipo() == TipoTypeDescriptor.ERROR) {
+			this.resType = new TypeDescriptor(TipoTypeDescriptor.ERROR);
 			return;
 		}
 		

@@ -11,8 +11,7 @@ import ast.NodeProgram;
 
 public class CodeGeneratorVisitor implements IVisitor {
 
-	private String codiceDc; // mantiene il codice della visita
-	
+	//private String codiceDc; // mantiene il codice della visita
 	//private boolean errors;  flag che indica se ci sono errori
 	
 	@Override
@@ -35,6 +34,7 @@ public class CodeGeneratorVisitor implements IVisitor {
 
 	@Override
 	public void visit(NodeBinOp node) {
+		/*
 		node.getSx().accept(this);
 		String sxCodice = codiceDc;
 		node.getDx().accept(this);
@@ -42,7 +42,8 @@ public class CodeGeneratorVisitor implements IVisitor {
 		
 		if() //controlli di errore
 		
-		codiceDc = ; //codice dell’espressione binaria
+		codiceDc = ; //codice dell’espressione binari
+		*/
 	}
 
 
