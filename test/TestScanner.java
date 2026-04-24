@@ -252,6 +252,11 @@ public class TestScanner {
 		assertEquals(TokenType.EOF, t.getTipo());
 	}
 	
+	/**
+	 * Verifica il corretto funzionamento del metodo peekToken()
+	 * Dimostra che peekToken() permette di "sbirciare"il prossimo token senza consumare l'input
+	 * File: testGenerale.txt
+	 */
 	@Test
 	void peekToken () throws Exception {
 		inizializzaScanner("testGenerale.txt");

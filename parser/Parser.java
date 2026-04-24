@@ -162,6 +162,31 @@ public class Parser {
 			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " +  t.getTipo().toString());
 		}
 	}
+	
+	/**
+	 * Regole 17, 18: Ty -> float | int
+	 * 
+	 * @return Il tipo enumerato LangType corrispondente
+	 * @throws SyntacticException Se il tipo non è valido
+	 */
+	private LangType parseTy() throws SyntacticException {
+		Token t = this.peek();
+
+		switch (t.getTipo()) {
+			//Ty -> float
+			case TYFLOAT -> {
+				match(TokenType.TYFLOAT);
+				return LangType.FLOAT;
+			}
+			//Ty -> int
+			case TYINT -> {
+				match(TokenType.TYINT);
+				return LangType.INT;
+			}
+			
+			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " + t.getTipo().toString());
+		}
+	}
 
 	/**
 	 * Regole 5, 6: DclP -> ; | = Exp ;
@@ -342,31 +367,6 @@ public class Parser {
 			}
 			
 			default -> throw new SyntacticException(t.getRiga(), "Atteso '*', '/', '+', '-' o ';', trovato " + t.getTipo());
-		}
-	}
-
-	/**
-	 * Regole 17, 18: Ty -> float | int
-	 * 
-	 * @return Il tipo enumerato LangType corrispondente
-	 * @throws SyntacticException Se il tipo non è valido
-	 */
-	private LangType parseTy() throws SyntacticException {
-		Token t = this.peek();
-
-		switch (t.getTipo()) {
-			//Ty -> float
-			case TYFLOAT -> {
-				match(TokenType.TYFLOAT);
-				return LangType.FLOAT;
-			}
-			//Ty -> int
-			case TYINT -> {
-				match(TokenType.TYINT);
-				return LangType.INT;
-			}
-			
-			default -> throw new SyntacticException(t.getRiga(), "Atteso valore numerico, trovato " + t.getTipo().toString());
 		}
 	}
 

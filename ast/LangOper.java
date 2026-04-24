@@ -7,5 +7,6 @@ public enum LangOper {
     PLUS,
     MINUS,
     TIMES,
-    DIVIDE
+    DIVIDE,
+    DIV_FLOAT
 }
