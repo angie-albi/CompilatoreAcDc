@@ -3,7 +3,7 @@ package ast;
 import visitor.IVisitor;
 
 /**
- * Rappresenta un nodo dell'AST per l'istruzione di stampa+
+ * Rappresenta un nodo dell'AST per l'istruzione di stampa
  */
 public class NodePrint extends NodeStat {
 

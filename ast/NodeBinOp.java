@@ -35,6 +35,16 @@ public class NodeBinOp extends NodeExpr {
 	}
 	
 	/**
+	 * Cambia il tipo di operatore dell'esspressione 
+	 * Usato per cambiare da DIVIDE a DIV_FLOAT
+	 * 
+	 * @param op Il nuovo operatore dell'espressione
+	 */
+	public void setOp(LangOper op) {
+	    this.op = op;
+	}
+	
+	/**
 	 * Restituisce l'operando a sinistra dell'operatore
 	 * 
 	 * @return Il nodo espressione sinistro
