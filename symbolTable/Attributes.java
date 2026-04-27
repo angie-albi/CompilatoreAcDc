@@ -8,6 +8,7 @@ import ast.LangType;
 public class Attributes {
 	
 	private LangType tipo;
+	private char registro;
 
 	/**
 	 * Costruisce un nuovo oggetto attributi per una variabile
@@ -29,12 +30,30 @@ public class Attributes {
 	}
 	
 	/**
+	 * Imposta il carattere del registro associato alla variabile
+	 * 
+	 * @param registro Il carattere (es. 'a', 'b') da assegnare
+	 */
+	public void setRegistro(char registro) {
+		this.registro = registro;
+	}
+
+	/**
+	 * Restituisce il registro associato alla variabile
+	 * 
+	 * @return Il carattere del registro
+	 */
+	public char getRegistro() {
+		return registro;
+	}
+	
+	/**
 	 * Restituisce una rappresentazione testuale degli attributi
 	 * 
-	 * @return Una stringa nel formato <Attributes,...>
+	 * @return Una stringa formattata <Attributes,tipo=...,reg=...>
 	 */
 	@Override
 	public String toString() {
-		return "<Attributes," + tipo + ">";
+		return "<Attributes,tipo=" + tipo + ", reg=" + registro + ">";
 	}
 }
