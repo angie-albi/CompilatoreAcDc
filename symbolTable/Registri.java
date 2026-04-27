@@ -18,10 +18,10 @@ public class Registri {
 	}
 
 	/**
-	 * Fornisce un nuovo registro disponibile.
+	 * Fornisce un nuovo registro disponibile
 	 * 
-	 * @return Il carattere rappresentante il registro (es. 'a', 'b', ...), ritorna 
-	 * il carattere speciale (es. 0) se i registri (le lettere) sono esauriti
+	 * @return Il carattere rappresentante il registro (es. 'a', 'b', ...),
+	 * ritorna 0 se i registri (le lettere) sono esauriti
 	 */
 	public static char newRegister() {
 		// Controllo se abbiamo superato la lettera 'z'
