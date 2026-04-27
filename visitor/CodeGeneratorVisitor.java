@@ -63,10 +63,10 @@ public class CodeGeneratorVisitor implements IVisitor {
 	@Override
 	public void visit(NodeProgram node) {
 		for (NodeDecSt decSt: node.getDecSt()) {
-			decSt.accept(this);
-			
-			if(!this.log.isEmpty())
+			if(!log.isEmpty())
 				return;
+			
+			decSt.accept(this);
 		}
 	}
 
@@ -92,11 +92,15 @@ public class CodeGeneratorVisitor implements IVisitor {
 	 */
 	@Override
 	public void visit(NodeDecl node) {
+		// Controllo iniziale: se c'è già un errore propagato dall'alto, fermiamo subito la visita
+		if (!log.isEmpty()) 
+			return;
+		
 		char reg = Registri.newRegister();
 		
 		// Controllo se il registro è valido (
 		if (reg == 0) {
-			this.log = "Errore: Registri esauriti"; 
+			log = "Errore: Registri esauriti per " + node.getId().getName(); 
 			return; 
 		}
 		
@@ -124,11 +128,19 @@ public class CodeGeneratorVisitor implements IVisitor {
 	 */
 	@Override
 	public void visit(NodeBinOp node) {
+		// Controllo iniziale: se c'è già un errore propagato dall'alto, fermiamo subito la visita
+		if (!log.isEmpty()) 
+			return;
+		
 		// Visita il figlio sinistro (accoda automaticamente il suo codice in codiceDc)
 		node.getSx().accept(this);
+		if (!log.isEmpty()) 
+			return;
 		
 		// Visita il figlio destro
 		node.getDx().accept(this);
+		if (!log.isEmpty()) 
+			return;
 		
 		//Identifica l'operatore e lo accoda
 		LangOper op = node.getOp();
@@ -151,13 +163,19 @@ public class CodeGeneratorVisitor implements IVisitor {
 	 */
 	@Override
 	public void visit(NodeAssign node) {
+		// Controllo iniziale: se c'è già un errore propagato dall'alto, fermiamo subito la visita
+		if (!log.isEmpty()) 
+			return;
+
 		// Recupero il registro della variabile dalla Symbol Table 
 		Attributes attr = SymbolTable.lookup(node.getId().getName());
 		char reg = attr.getRegistro();
 		
 		// Visito l'espressione a destra dell'uguale
 		node.getExpr().accept(this);
-		
+		if (!log.isEmpty()) 
+			return;
+
 		codiceDc += "s" + reg + " ";
 	}
 
@@ -169,6 +187,10 @@ public class CodeGeneratorVisitor implements IVisitor {
 	 */
 	@Override
 	public void visit(NodePrint node) {
+		// Controllo iniziale: se c'è già un errore propagato dall'alto, fermiamo subito la visita
+		if (!log.isEmpty()) 
+			return;
+				
 		// Recupero il registro della variabile da stampare
 		Attributes attr = SymbolTable.lookup(node.getId().getName());
 		char reg = attr.getRegistro();
@@ -186,6 +208,11 @@ public class CodeGeneratorVisitor implements IVisitor {
 	 */
 	@Override
 	public void visit(NodeDeref node) {
+		// Controllo iniziale: se c'è già un errore propagato dall'alto, fermiamo subito la visita
+		if (!log.isEmpty()) {
+			return;
+		}
+				
 		// Recupero il registro della variabile dalla Symbol Table
 		Attributes attr = SymbolTable.lookup(node.getId().getName());
 		char reg = attr.getRegistro();
@@ -201,6 +228,10 @@ public class CodeGeneratorVisitor implements IVisitor {
 	 */
 	@Override
 	public void visit(NodeCost node) {
+		// Controllo iniziale: se c'è già un errore propagato dall'alto, fermiamo subito la visita
+		if (!log.isEmpty()) 
+			return;
+		
 		codiceDc += node.getValore() + " ";
 	}
 }
