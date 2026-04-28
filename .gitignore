@@ -7,3 +7,4 @@ bin/
 
 # File compilati Java
 *.class
+*.dc

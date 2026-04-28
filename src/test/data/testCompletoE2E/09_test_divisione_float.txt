@@ -1,0 +1,4 @@
+float f1 = 10.0;
+float f2 = 3.0;
+float res = f1 / f2;
+print res;
