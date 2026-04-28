@@ -1,5 +1,0 @@
-10 sa 3.5 sb la p P
-lb p P
-la 5 + sa lb 2.0 * sb la p P
-lb p P
-0 sc la 3.0  5 k / 0 k sc lc p P
