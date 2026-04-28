@@ -1,0 +1,13 @@
+int a = 10;
+float b = 3.5;
+print a;
+print b;
+
+a += 5;
+b = b * 2.0;
+print a;
+print b;
+
+float c;
+c = a / 3.0;
+print c;
