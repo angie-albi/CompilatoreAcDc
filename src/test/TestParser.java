@@ -14,7 +14,7 @@ import scanner.Scanner;
  */
 class TestParser {
 
-	private static final String PATH = "test/data/testParser/";
+	private static final String PATH = "src/test/data/testParser/";
 	private Scanner scanner;
 	private Parser parser;
 

@@ -63,7 +63,7 @@ public class Token {
 	/**
 	 * Genera una rappresentazione testuale del token formattata
 	 * 
-	 * @return Una stringa nel formato <...,r=...,val=....> oppure <...,r=...>.
+	 * @return Una stringa nel formato {@code <...,r=...,val=....> oppure <...,r=...>}
 	 */
 	@Override
 	public String toString() {

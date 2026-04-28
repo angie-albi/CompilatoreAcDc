@@ -50,7 +50,7 @@ public class Attributes {
 	/**
 	 * Restituisce una rappresentazione testuale degli attributi
 	 * 
-	 * @return Una stringa formattata <Attributes,tipo=...,reg=...>
+	 * @return Una stringa formattata {@code <Attributes,tipo=...,reg=...>}
 	 */
 	@Override
 	public String toString() {

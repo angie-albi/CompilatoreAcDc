@@ -43,7 +43,7 @@ public class NodePrint extends NodeStat {
 	/**
 	 * Restituisce una rappresentazione sintetica del nodo 
 	 * 
-	 * @return Stringa formattata come <Print,id=...>
+	 * @return Stringa formattata come {@code <Print,id=...>}
 	 */
 	@Override
 	public String toString() {

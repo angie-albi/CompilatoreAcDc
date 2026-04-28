@@ -55,7 +55,7 @@ public class NodeCost extends NodeExpr {
 	/**
 	 * Restituisce una rappresentazione sintetica del nodo
 	 * 
-	 * @return Stringa formattata come <Cost,valore=...,tipo=...>
+	 * @return Stringa formattata come {@code <Cost,valore=...,tipo=...>}
 	 */
 	@Override
 	public String toString() {

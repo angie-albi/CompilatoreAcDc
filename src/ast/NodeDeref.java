@@ -43,7 +43,7 @@ public class NodeDeref extends NodeExpr {
 	/**
 	 * Restituisce una rappresentazione sintetica del nodo 
 	 * 
-	 * @return Stringa formattata come <Deref,id=...>
+	 * @return Stringa formattata come {@code <Deref,id=...>}
 	 */
 	@Override
 	public String toString() {

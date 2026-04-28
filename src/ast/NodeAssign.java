@@ -54,7 +54,7 @@ public class NodeAssign extends NodeStat {
 	/**
 	 * Restituisce una rappresentazione testuale del nodo di assegnamento
 	 * 
-	 * @return Una stringa nel formato <Assign,id=...,expr=...>
+	 * @return Una stringa nel formato {@code <Assign,id=...,expr=...>}
 	 */
 	@Override
 	public String toString() {

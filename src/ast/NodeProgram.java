@@ -46,7 +46,7 @@ public class NodeProgram extends NodeAst {
 	 * Restituisce una rappresentazione testuale dell'intero programma, 
 	 * includendo a cascata tutti i nodi figli contenuti nella lista
 	 * 
-	 * @return Stringa formattata come <Program,...>
+	 * @return Stringa formattata come {@code <Program,...>}
 	 */
 	@Override
 	public String toString() {

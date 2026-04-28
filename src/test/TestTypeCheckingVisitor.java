@@ -14,7 +14,7 @@ import visitor.TypeCheckingVisitor;
  */
 class TestTypeCheckingVisitor {
 
-	private static final String PATH = "test/data/testTypeChecking/";
+	private static final String PATH = "src/test/data/testTypeChecking/";
 
 	/**
 	 * Metodo di supporto per analizzare un file ed eseguire il Type Checking

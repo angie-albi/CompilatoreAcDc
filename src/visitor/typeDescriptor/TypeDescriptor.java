@@ -52,7 +52,7 @@ public class TypeDescriptor {
 	/**
 	 * Verifica se il tipo corrente è compatibile con un altro tipo td (INT è compatibile con FLOAT)
 	 * 
-	 * @param tD Il tipo con cui verificare la compatibilità
+	 * @param td Il tipo con cui verificare la compatibilità
 	 * @return true se i tipi sono compatibili, false altrimenti
 	 */
 	public boolean compatibile(TypeDescriptor td) {
@@ -65,8 +65,8 @@ public class TypeDescriptor {
 	/**
 	 * Restituisce una rappresentazione testuale del descrittore di tipo
 	 * 
-	 * @return Una stringa nel formato <TypeDescriptor,tipo=...> per tipo semplice
-	 * 		   altrimenti, <TypeDescriptor,tipo=...,msg=...>
+	 * @return Una stringa nel formato {@code <TypeDescriptor,tipo=...>} per tipo semplice
+	 * 		   altrimenti, {@code <TypeDescriptor,tipo=...,msg=...>}
 	 */
 	@Override
 	public String toString() {

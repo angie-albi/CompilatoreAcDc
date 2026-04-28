@@ -43,7 +43,7 @@ public class NodeId extends NodeAst{
 	/**
 	 * Restituisce una rappresentazione sintetica del nodo
 	 * 
-	 * @return Stringa formattata come <Id=...>
+	 * @return Stringa formattata come {@code <Id=...>}
 	 */
 	@Override
 	public String toString() {

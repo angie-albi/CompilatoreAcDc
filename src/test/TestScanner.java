@@ -14,7 +14,7 @@ import token.TokenType;
  */
 public class TestScanner {
 
-	private static final String PATH = "test/data/testScanner/";
+	private static final String PATH = "src/test/data/testScanner/";
 	private Scanner scanner;
 
 	/**

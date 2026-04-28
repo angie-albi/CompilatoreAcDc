@@ -77,7 +77,7 @@ public class NodeBinOp extends NodeExpr {
 	/**
 	 * Restituisce una rappresentazione sintetica del nodo
 	 * 
-	 * @return Stringa formattata come <BinOp,...:sx=...,dx=...>
+	 * @return Stringa formattata come {@code <BinOp,...:sx=...,dx=...>}
 	 */
 	@Override
 	public String toString() {

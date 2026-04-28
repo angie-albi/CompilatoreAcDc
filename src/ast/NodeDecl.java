@@ -66,7 +66,7 @@ public class NodeDecl extends NodeDecSt {
 	/**
 	 * Restituisce una rappresentazione testuale del nodo 
 	 * 
-	 * @return Una stringa formattata come <Decl,id=...,tipo=...,init=...>
+	 * @return Una stringa formattata come {@code <Decl,id=...,tipo=...,init=...>}
 	 */
 	@Override
 	public String toString() {

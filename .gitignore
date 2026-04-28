@@ -1,9 +1,7 @@
-# File di configurazione di Eclipse
-.project
-.classpath
+# File di configurazione locali e cartelle temporanee di Eclipse
 .settings/
 .metadata/
-bin/
 
-# File compilati Java
+# Cartelle dei file compilati e file binari
+bin/
 *.class

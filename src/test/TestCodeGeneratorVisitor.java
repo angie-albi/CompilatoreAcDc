@@ -15,7 +15,7 @@ import visitor.TypeCheckingVisitor;
  */
 class TestCodeGeneratorVisitor {
 
-	private static final String PATH = "test/data/testCodeGenerator/";
+	private static final String PATH = "src/test/data/testCodeGenerator/";
 
 	/**
 	 * Metodo di supporto per eseguire l'intera pipeline fino alla generazione del codice
