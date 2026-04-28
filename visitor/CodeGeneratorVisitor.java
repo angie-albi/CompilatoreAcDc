@@ -111,6 +111,8 @@ public class CodeGeneratorVisitor implements IVisitor {
 		// Gestione del valore di inizializzazione
 		if (node.getInit() != null) {
 			node.getInit().accept(this);
+			if (!log.isEmpty()) 
+				return;
 		} else {
 			// se non c'è inizializzazione (es. "int a;"), lo inizializzo a 0
 			codiceDc += "0 ";
@@ -153,6 +155,8 @@ public class CodeGeneratorVisitor implements IVisitor {
 			
 			// Divisione float: setta precisione a 5, divide, resetta precisione a 0
 			case DIV_FLOAT -> codiceDc += " 5 k / 0 k ";
+			
+			default -> log = "Operazione non supportata: " + node.getOp();
 		}
 	}
 
