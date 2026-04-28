@@ -15,9 +15,9 @@
 
 ## 🧐 Di cosa si tratta?
 
-Questo progetto è l'implementazione di un vero e proprio **traduttore (compilatore)** per un linguaggio didattico chiamato `"ac"`. L'applicativo legge un file sorgente, ne analizza la validità formale e semantica, e genera in output un file eseguibile `.dc` contenente il codice macchina equivalente, pronto per essere calcolato dalla storica utility Unix `dc` (Desk Calculator).
+Questo progetto implementa un **traduttore (compilatore)** per il linguaggio didattico `"ac"`. Il software analizza un file sorgente per verificarne la correttezza lessicale, sintattica e semantica, producendo un file eseguibile `.dc`. Questo output contiene il codice macchina in notazione postfissa, eseguibile tramite l'utility Unix `dc` (Desk Calculator).
 
-Il software è stato ingegnerizzato seguendo le *best practices* della progettazione dei compilatori, separando nettamente le fasi di compilazione e implementando il **Design Pattern Visitor** per l'esplorazione dell'Albero di Sintassi Astratta (AST).
+L'architettura segue i principi della moderna ingegneria dei linguaggi, utilizzando il **Design Pattern Visitor** per separare le fasi di analisi e generazione dall'Albero di Sintassi Astratta (AST).
 
 ---
 
@@ -44,45 +44,45 @@ Il software è stato ingegnerizzato seguendo le *best practices* della progettaz
 
 ## 🏗️ Struttura del Progetto
 
-Il codice sorgente è rigorosamente disaccoppiato in package tematici:
+L'organizzazione dei package segue rigorosamente le fasi di compilazione:
 
 ```text
 .
 ├── src/                      # Codice sorgente Java
-│   ├── main/                 # Entry point del compilatore (Main.java)
-│   ├── scanner/              # Analizzatore lessicale e gestione token
-│   ├── parser/               # Analizzatore sintattico e regole grammaticali
-│   ├── ast/                  # Nodi dell'Albero di Sintassi Astratta (AST)
-│   ├── symbolTable/          # Tabella dei simboli e gestione registri
-│   ├── visitor/              # Pattern Visitor (TypeChecking e CodeGeneration)
-│   └── test/data/testE2E/    # File sorgenti (.txt) per i test automatici
+│   ├── main/                 # Punto di ingresso (Main.java)
+│   ├── scanner/              # Lexer e gestione eccezioni lessicali
+│   ├── parser/               # Analizzatore sintattico
+│   ├── ast/                  # Nodi dell'Albero di Sintassi Astratta
+│   ├── symbolTable/          # Gestione simboli e registri dc
+│   ├── visitor/              # Implementazione del Pattern Visitor
+│   └── test/data/            # Dataset per i test (Scanner, Parser, E2E)
 ├── docs/                     # Documentazione Javadoc per GitHub Pages
-└── run_e2e_tests.sh          # Script Bash per l'automazione dei test
+└── runTestCompletoE2E.sh     # Script di automazione per test End-to-End
 ```
 
 ---
 
 ## 📖 Documentazione Tecnica (Javadoc)
 
-L'intero progetto è documentato a livello di classi e metodi. La documentazione è ospitata online grazie a **GitHub Pages**.
+Il progetto è interamente documentato. La documentazione ipertestuale è consultabile online tramite GitHub Pages:
 
 👉 **[Consulta il Javadoc del Compilatore AcDc](https://angie-albi.github.io/CompilatoreAcDc/)**
 
 ---
 
-## 🧪 Testing Automatizzato (End-to-End)
+## 🧪 Testing Automatizzato
 
-Il progetto include una suite di 10 test End-to-End studiati per coprire tutte le ramificazioni del compilatore (Golden path, eccezioni lessicali, sintattiche, semantiche ed esaurimento registri).
+Il sistema include una suite di test **End-to-End** che copre casi di successo, errori lessicali, sintattici, semantici e limiti fisici dei registri.
 
-Per eseguire l'intera suite di test in modo automatico su sistemi Unix (Linux/macOS/WSL), aprire il terminale nella root del progetto ed eseguire:
+Per eseguire i test su Linux/WSL/macOS:
 ```bash
-./run_e2e_tests.sh
+chmod +x runTestCompletoE2E.sh
+./runTestCompletoE2E.sh
 ```
-Lo script compilerà i file in sequenza, evidenzierà gli errori intercettati in modo pulito e, in caso di successo, invierà automaticamente il codice generato alla calcolatrice `dc` per stamparne il risultato matematico.
 
 ---
 
-## ⚙️ Installazione e Utilizzo Manuale
+## 🚀 Guida all'Utilizzo Manuale
 
 Segui questi passaggi per scaricare e testare il compilatore in locale:
 
