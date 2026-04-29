@@ -4,7 +4,7 @@
 cd src
 
 # Cicla su tutti i file .txt che si trovano nella cartella E2E
-for filepath in test/data/testE2E/*.txt; do
+for filepath in test/data/testCompletoE2E/*.txt; do
     echo -e "\n\033[1;34m---------------------------------------\033[0m"
     echo -e "\033[1;33m🔄 ESECUZIONE TEST: $filepath\033[0m"
     echo -e "\033[1;34m---------------------------------------\033[0m"

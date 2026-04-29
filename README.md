@@ -7,7 +7,8 @@
     <img src="https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=openjdk" alt="Java Version">
     <img src="https://img.shields.io/badge/Architettura-AST-red?style=for-the-badge" alt="Abstract Syntax Tree">
     <img src="https://img.shields.io/badge/Pattern-Visitor-blueviolet?style=for-the-badge" alt="Visitor Pattern">
-    <img src="https://img.shields.io/badge/Test-Bash_Script-25A162?style=for-the-badge&logo=gnu-bash" alt="Bash Testing">
+    <img src="https://img.shields.io/badge/Test-JUnit_5-25A162?style=for-the-badge&logo=junit5" alt="JUnit 5">
+    <img src="https://img.shields.io/badge/Test-Bash_Script-4EAA25?style=for-the-badge&logo=gnu-bash" alt="Bash Testing">
   </p>
 </div>
 
@@ -15,7 +16,7 @@
 
 ## 🧐 Di cosa si tratta?
 
-Questo progetto implementa un **traduttore (compilatore)** per il linguaggio didattico `"ac"`. Il software analizza un file sorgente per verificarne la correttezza lessicale, sintattica e semantica, producendo un file eseguibile `.dc`. Questo output contiene il codice macchina in notazione postfissa, eseguibile tramite l'utility Unix `dc` (Desk Calculator).
+Questo progetto implementa un **traduttore (compilatore)** per il linguaggio didattico `ac`. Il software analizza un file sorgente per verificarne la correttezza lessicale, sintattica e semantica, producendo un file eseguibile `.dc`. Questo output contiene il codice macchina in notazione postfissa, eseguibile tramite l'utility Unix `dc` (Desk Calculator).
 
 L'architettura segue i principi della moderna ingegneria dei linguaggi, utilizzando il **Design Pattern Visitor** per separare le fasi di analisi e generazione dall'Albero di Sintassi Astratta (AST).
 
@@ -50,12 +51,16 @@ L'organizzazione dei package segue rigorosamente le fasi di compilazione:
 .
 ├── src/                      # Codice sorgente Java
 │   ├── main/                 # Punto di ingresso (Main.java)
-│   ├── scanner/              # Lexer e gestione eccezioni lessicali
-│   ├── parser/               # Analizzatore sintattico
+│   ├── scanner/              # Analizzatore Lessicale
+│   ├── parser/               # Analizzatore Sintattico
 │   ├── ast/                  # Nodi dell'Albero di Sintassi Astratta
 │   ├── symbolTable/          # Gestione simboli e registri dc
+│   ├── token/                # Definizione dei token testuali
 │   ├── visitor/              # Implementazione del Pattern Visitor
-│   └── test/data/            # Dataset per i test (Scanner, Parser, E2E)
+│   │   └── typeDescriptor/   # Descrittori dei tipi per l'analisi semantica
+│   ├── test/                 # Classi di test JUnit
+│   │   └── data/             # File di testo per i test (Scanner, Parser, E2E, ecc.)
+│   └── input.txt             # File sorgente di default per testare il compilatore
 ├── docs/                     # Documentazione Javadoc per GitHub Pages
 └── runTestCompletoE2E.sh     # Script di automazione per test End-to-End
 ```
@@ -64,32 +69,50 @@ L'organizzazione dei package segue rigorosamente le fasi di compilazione:
 
 ## 📖 Documentazione Tecnica (Javadoc)
 
-Il progetto è interamente documentato. La documentazione ipertestuale è consultabile online tramite GitHub Pages:
+Il progetto è interamente documentato. È possibile consultare la documentazione tecnica completa in formato ipertestuale in due modi:
 
-👉 **[Consulta il Javadoc del Compilatore AcDc](https://angie-albi.github.io/CompilatoreAcDc/)**
-
----
-
-## 🧪 Testing Automatizzato
-
-Il sistema include una suite di test **End-to-End** che copre casi di successo, errori lessicali, sintattici, semantici e limiti fisici dei registri.
-
-Per eseguire i test su Linux/WSL/macOS:
-```bash
-chmod +x runTestCompletoE2E.sh
-./runTestCompletoE2E.sh
-```
+* **Online:** Tramite GitHub Pages 👉 **[Consulta il Javadoc](https://angie-albi.github.io/CompilatoreAcDc/)**
+* **In locale:** Navigando all'interno della cartella `doc/` del progetto e aprendo il file **`index.html`** con un qualsiasi browser web.
 
 ---
 
-## 🚀 Guida all'Utilizzo Manuale
+## 🧪 Testing e Qualità
 
-Segui questi passaggi per scaricare e testare il compilatore in locale:
+La stabilità del compilatore è garantita da un doppio livello di test:
+
+* ✅ **Test Unitari (JUnit 5):** Verifica isolata di ogni componente (`TestScanner`, `TestParser`, `TestTypeCheckingVisitor`, `TestCodeGeneratorVisitor`) per assicurare la corretta costruzione dell'AST e la propagazione degli errori.
+* ✅ **Test End-to-End (Bash Script):** Automazione che compila file sorgente complessi e verifica l'output finale del programma, inclusa la gestione dei limiti fisici dei registri.
+
+---
+
+## 💻 Importazione in Eclipse IDE
+
+Per integrare rapidamente il progetto nell'ambiente di sviluppo Eclipse:
+
+1. **Apertura**: Selezionare il menu **File** e cliccare sulla voce **Open Projects from File System...**.
+2. **Selezione della directory**: Nella finestra di dialogo, cliccare sul pulsante **Directory...** e individuare la cartella radice del progetto `CompilatoreAcDc` (quella contenente le cartelle `src` e `doc`).
+3. **Conferma**: Verificare che la casella corrispondente al progetto sia selezionata e premere **Finish**. Eclipse configurerà automaticamente l'ambiente e riconoscerà i package Java.
+
+---
+
+## 🚀 Modalità di Esecuzione (da Eclipse)
+
+Una volta importato il progetto, puoi testare il compilatore in due modi:
+
+* **Esecuzione dell'intero Compilatore:** Cliccare con il tasto destro su `src/main/Main.java` e selezionare **Run As > Java Application**. Assicurati di aver impostato il percorso del file di input (`.txt`) all'interno del codice del Main.
+* **Esecuzione della Suite di Test:** Cliccare con il tasto destro sulla cartella `src/test` (oppure su una singola classe di test) e selezionare **Run As > JUnit Test** per verificare che tutti i componenti abbiano la "barra verde".
+
+---
+
+## ⚙️ Guida all'Utilizzo Manuale (Terminale)
+
+Se preferisci utilizzare la riga di comando senza un IDE:
 
 1. **Clona la repository:**
    ```bash
-   git clone [https://github.com/angie-albi/CompilatoreAcDc.git](https://github.com/angie-albi/CompilatoreAcDc.git)
-   ```
+   git clone https://github.com/angie-albi/CompilatoreAcDc.git
+   
+    ```
 2. **Entra nella cartella dei sorgenti:**
    ```bash
    cd CompilatoreAcDc/src
@@ -100,14 +123,19 @@ Segui questi passaggi per scaricare e testare il compilatore in locale:
    ```
 4. **Esegui il compilatore passando un file sorgente:**
    ```bash
-   java main.Main test/data/testE2E/01_test_corretto_completo.txt
+   java main.Main input.txt
    ```
-   *Il sistema genererà un file `.dc` con lo stesso nome nella directory del file sorgente.*
-
 5. **(Opzionale) Esegui il codice generato con dc (richiede Linux/WSL/macOS):**
    ```bash
-   dc test/data/testE2E/01_test_corretto_completo.dc
+   dc input.dc
    ```
+
+*Per eseguire i test automatizzati Bash:*
+```bash
+cd ..
+chmod +x runTestCompletoE2E.sh
+./runTestCompletoE2E.sh
+```
 
 ---
 
